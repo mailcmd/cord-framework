@@ -1,5 +1,4 @@
 defmodule CORD.Utils do
-  alias Hex.API.Key
 	def string_keys_to_atom(nil), do: %{}
 	def string_keys_to_atom(map) do
     map |> Enum.map(fn
