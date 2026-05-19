@@ -62,7 +62,7 @@ defmodule CORD.HTTPServer do
              true <- function_exported?(module, fun, 2) do
           
           # TODO: Security control, module name starting with "<app_name>."
-          try do
+          # try do
             extra_params =
               list
               |> :lists.sublist(4, 99)
@@ -80,15 +80,15 @@ defmodule CORD.HTTPServer do
             module
             |> apply(fun, [conn, extra_params])
             |> build_resp()
-          rescue
-            e ->
-              Logger.log(
-                :error,
-                "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct" <>
-                "\n#{inspect e}"
-              )
-              send_resp(conn, 500, "Internal server error!\n")
-          end
+          # rescue
+          #   e ->
+          #     Logger.log(
+          #       :error,
+          #       "[CORD][HTTP] Function #{module}.#{fun} does not return a connection struct" <>
+          #       "\n#{inspect e}"
+          #     )
+          #     send_resp(conn, 500, "Internal server error!\n")
+          # end
           
         else
           _ ->
