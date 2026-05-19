@@ -7,7 +7,7 @@ defmodule CORD.Utils do
     end) |> Enum.into(%{})
   end
 
-  def httpc_get(url, headers) do
+  def httpc_get(url, headers \\ []) do
     headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     http_request_opts = [
       ssl: [
@@ -31,7 +31,12 @@ defmodule CORD.Utils do
     end
   end  
 
-  def httpc_post(url, headers, body, content_type) do
+  def httpc_post(
+        url,
+        headers \\ [],
+        body \\ "",
+        content_type \\ ~c"application/x-www-form-urlencoded"
+      ) do
     headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     http_request_opts = [
       ssl: [
