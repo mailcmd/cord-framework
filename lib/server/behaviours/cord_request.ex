@@ -57,4 +57,10 @@ defmodule CORD.Request do
       var!(conn) = put_resp_content_type(var!(conn), unquote(type))
     end
   end
+  
+  defmacro response_header(key, value) do
+    quote do
+      var!(conn) = put_resp_header(var!(conn), to_string(unquote(key)), unquote(value))
+    end
+  end
 end
