@@ -47,7 +47,7 @@ defmodule CORD.Application do
       {CORD.PermanentStorage, []}
     ]
     # User defined APP
-    ++ (@local_config[:app_supervisor] && [@local_config[:app_supervisor]] || []) |> IO.inspect
+    ++ (@local_config[:app_supervisor] && [@local_config[:app_supervisor]] || [])
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
 
