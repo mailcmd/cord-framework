@@ -1,4 +1,5 @@
 defmodule CORD.Utils do
+  alias Hex.API.Key
 	def string_keys_to_atom(nil), do: %{}
 	def string_keys_to_atom(map) do
     map |> Enum.map(fn
@@ -8,7 +9,11 @@ defmodule CORD.Utils do
   end
 
   def httpc_get(url, headers \\ []) do
-    headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
+    headers =
+      headers
+      |> Keyword.put("user-agent", "Erlang HTTPc")
+      |> Enum.map(fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
+    
     http_request_opts = [
       autoredirect: true,
       ssl: [
@@ -38,7 +43,11 @@ defmodule CORD.Utils do
         body \\ "",
         content_type \\ "application/x-www-form-urlencoded"
       ) do
-    headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
+    headers =
+      headers
+      |> Keyword.put("user-agent", "Erlang HTTPc")
+      |> Enum.map(fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
+    
     http_request_opts = [
       autoredirect: true,
       ssl: [
