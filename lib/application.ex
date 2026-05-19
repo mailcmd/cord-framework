@@ -90,25 +90,6 @@ defmodule CORD.Application do
     )
   end
 
-  defp cowboy_child(port, :https) do
-    Supervisor.child_spec(
-      {
-        Plug.Cowboy,
-        scheme: :https,
-        plug: {CORD.Webserver, @config},
-        options: [
-          port: port,
-          ref: {:ranch_listener, "https_#{port}"},
-          dispatch: dispatcher(),
-          keyfile: Keyword.get(@local_config, :keyfile),
-          certfile: Keyword.get(@local_config, :certfile),
-          otp_app: :secure_app
-        ]
-      },
-      id: {:cowboy, port}
-    )
-  end
-  
   defp cowboy_child({port, keyfile, certfile}, :https) do
     Supervisor.child_spec(
       {
@@ -128,4 +109,23 @@ defmodule CORD.Application do
     )
   end
 
+  defp cowboy_child(port, :https) do
+    Supervisor.child_spec(
+      {
+        Plug.Cowboy,
+        scheme: :https,
+        plug: {CORD.Webserver, @config},
+        options: [
+          port: port,
+          ref: {:ranch_listener, "https_#{port}"},
+          dispatch: dispatcher(),
+          keyfile: Keyword.get(@local_config, :keyfile),
+          certfile: Keyword.get(@local_config, :certfile),
+          otp_app: :secure_app
+        ]
+      },
+      id: {:cowboy, port}
+    )
+  end
+  
 end
