@@ -11,7 +11,7 @@ defmodule CORD.Utils do
   def httpc_get(url, headers \\ []) do
     headers =
       headers
-      |> Keyword.put("user-agent", "Erlang HTTPc")
+      |> Keyword.put(:"user-agent", "Erlang HTTPc")
       |> Enum.map(fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     
     http_request_opts = [
@@ -45,7 +45,7 @@ defmodule CORD.Utils do
       ) do
     headers =
       headers
-      |> Keyword.put("user-agent", "Erlang HTTPc")
+      |> Keyword.put(:"user-agent", "Erlang HTTPc")
       |> Enum.map(fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     
     http_request_opts = [
