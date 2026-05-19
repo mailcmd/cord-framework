@@ -11,39 +11,29 @@ defmodule CORD.Application do
   def start(_type, _args) do
     Logger.configure(level: Application.get_env(:logger, :level))
 
-    port = Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port)) 
+    port = Keyword.get(@local_config, :port, Keyword.fetch!(@config, :port))
     sport = Keyword.get(@local_config, :https_port, Keyword.fetch!(@config, :https_port))
+
     http_server =
-      [
-        {
-          Plug.Cowboy,
-          scheme: :http,
-          plug: {CORD.Webserver, @config},
-          options: [
-            port: port,
-            dispatch: dispatcher()
-          ]
-        }
-      ]
-      ++
+      if is_list(port) do
+        Enum.map(port, &cowboy_child(&1))
+      else
+        [ cowboy_child(port) ]
+      end
+
+    # sorry for this :'(
+    https_server =
       if @local_config[:https] do
-        [{
-          Plug.Cowboy,
-          scheme: :https,
-          plug: {CORD.Webserver, @config},
-          options: [
-            port: sport,
-            dispatch: dispatcher(),
-            keyfile: Keyword.get(@local_config, :keyfile),
-            certfile: Keyword.get(@local_config, :certfile),
-            otp_app: :secure_app          
-          ]
-        }]
+        if is_list(sport) do
+          Enum.map(sport, &cowboy_child(&1, :https))
+        else
+          [ cowboy_child(sport, :https) ]
+        end
       else
         []
       end
 
-    children = http_server ++ [
+    children = http_server ++ https_server ++ [
       # Channels manager
       {CORD.ChannelsMaster, [:broadcast]},
       # Events manager
@@ -57,13 +47,13 @@ defmodule CORD.Application do
       {CORD.PermanentStorage, []}
     ]
     # User defined APP
-    ++ (@local_config[:app_supervisor] && [@local_config[:app_supervisor]] || [])
+    ++ (@local_config[:app_supervisor] && [@local_config[:app_supervisor]] || []) |> IO.inspect
 
     opts = [strategy: :one_for_one, name: CORD.Supervisor]
 
     Logger.log(:notice,
                "[CORD] Starting CORD services in ports "<>
-               "#{port} #{@local_config[:https] && sport || ""}..."
+               "#{inspect port} #{inspect (@local_config[:https] && sport || "")}..."
     )
     Supervisor.start_link(children, opts)
   end
@@ -82,4 +72,41 @@ defmodule CORD.Application do
       }
     ]
   end
+
+  defp cowboy_child(port, scheme \\ :http)
+  defp cowboy_child(port, :http) do
+    Supervisor.child_spec(
+      {
+        Plug.Cowboy,
+        scheme: :http,
+        plug: {CORD.Webserver, @config},
+        options: [
+          port: port,
+          ref: {:ranch_listener, "http_#{port}"},
+          dispatch: dispatcher()
+        ]
+      },
+      id: {:cowboy, port}
+    )
+  end
+
+  defp cowboy_child(port, :https) do
+    Supervisor.child_spec(
+      {
+        Plug.Cowboy,
+        scheme: :https,
+        plug: {CORD.Webserver, @config},
+        options: [
+          port: port,
+          ref: {:ranch_listener, "https_#{port}"},
+          dispatch: dispatcher(),
+          keyfile: Keyword.get(@local_config, :keyfile),
+          certfile: Keyword.get(@local_config, :certfile),
+          otp_app: :secure_app
+        ]
+      },
+      id: {:cowboy, port}
+    )
+  end
+
 end
