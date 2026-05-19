@@ -17,7 +17,7 @@ defmodule CORD.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :inet],
+      extra_applications: [:logger, :inets, :ssl],
       mod: {CORD.Application, []}
     ]
   end
