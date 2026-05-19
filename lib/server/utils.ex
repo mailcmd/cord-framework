@@ -10,6 +10,7 @@ defmodule CORD.Utils do
   def httpc_get(url, headers \\ []) do
     headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     http_request_opts = [
+      autoredirect: true,
       ssl: [
         verify: :verify_peer,
         customize_hostname_check: [
@@ -35,10 +36,11 @@ defmodule CORD.Utils do
         url,
         headers \\ [],
         body \\ "",
-        content_type \\ ~c"application/x-www-form-urlencoded"
+        content_type \\ "application/x-www-form-urlencoded"
       ) do
     headers = Enum.map(headers, fn {k, v} -> {to_charlist(k), to_charlist(v)} end)
     http_request_opts = [
+      autoredirect: true,
       ssl: [
         verify: :verify_peer,
         customize_hostname_check: [
