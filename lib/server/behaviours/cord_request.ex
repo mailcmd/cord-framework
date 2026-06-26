@@ -16,7 +16,7 @@ defmodule CORD.Request do
   
   defmacro request(fun, do: block) do
     quote do
-      def unquote(fun)(var!(conn), var!(params) \\ nil) do
+      def unquote(fun)(var!(conn), var!(params)) do
         _ = var!(params)
         var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
@@ -26,7 +26,7 @@ defmodule CORD.Request do
 
   defmacro request(:get, fun, do: block) do
     quote do
-      def unquote(fun)(%{method: "GET"} = var!(conn), var!(params) \\ nil) do
+      def unquote(fun)(%{method: "GET"} = var!(conn), var!(params)) do
         _ = var!(params)
         var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
@@ -36,7 +36,7 @@ defmodule CORD.Request do
 
   defmacro request(:post, fun, do: block) do
     quote do
-      def unquote(fun)(%{method: "POST"} = var!(conn), var!(params) \\ nil) do
+      def unquote(fun)(%{method: "POST"} = var!(conn), var!(params)) do
         _ = var!(params)
         var!(conn) = put_resp_header(var!(conn), "server", @http_server_id)
         unquote(block)
